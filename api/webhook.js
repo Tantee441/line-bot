@@ -58,7 +58,6 @@ async function handleText(event) {
     let target;
     if (!datePart) {
       target = todayISO();
-    }
     } else {
       target = parseDate(datePart);
     }
