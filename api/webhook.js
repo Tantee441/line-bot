@@ -258,33 +258,32 @@ async function parseIncomeWithGemini(text) {
 // ══════════════════════════════════════════════════════════════
 //  GOOGLE DRIVE
 // ══════════════════════════════════════════════════════════════
-async function saveImageToDrive(drive, imgBuf, mimeType, filename) {
-  // Find or create folder
-  const folderSearch = await drive.files.list({
-    q: `name='สลิปรายจ่าย' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-    fields: 'files(id)'
-  });
+async function saveImageToDrive(drive, imgBuf, mimeType, filename, slipDate) {
+  const ROOT_FOLDER_ID = '1dIRgs4tzNfl4G9fueD5PAAm5kLyMuy3i';
+  const monthName = slipDate ? slipDate.slice(0, 7) : new Date().toISOString().slice(0, 7);
 
-  let folderId;
-  if (folderSearch.data.files.length > 0) {
-    folderId = folderSearch.data.files[0].id;
-  } else {
-    const folder = await drive.files.create({
-      requestBody: { name: 'สลิปรายจ่าย', mimeType: 'application/vnd.google-apps.folder' },
+  async function findOrCreate(name, parentId) {
+    const res = await drive.files.list({
+      q: `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: 'files(id)'
+    });
+    if (res.data.files.length > 0) return res.data.files[0].id;
+    const f = await drive.files.create({
+      requestBody: { name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] },
       fields: 'id'
     });
-    folderId = folder.data.id;
+    return f.data.id;
   }
 
-  // Upload file
+  const monthId = await findOrCreate(monthName, ROOT_FOLDER_ID);
+
   const { Readable } = require('stream');
   const file = await drive.files.create({
-    requestBody: { name: filename, parents: [folderId] },
+    requestBody: { name: filename, parents: [monthId] },
     media: { mimeType, body: Readable.from(Buffer.from(imgBuf)) },
     fields: 'id, webViewLink'
   });
 
-  // Make public
   await drive.permissions.create({
     fileId: file.data.id,
     requestBody: { role: 'reader', type: 'anyone' }
