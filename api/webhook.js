@@ -188,7 +188,9 @@ async function handleImage(event) {
   
   let text = json.candidates[0].content.parts[0].text.trim();
   text = text.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
-  return JSON.parse(text);
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('Gemini ตอบไม่ใช่ JSON: ' + text.slice(0, 100));
+  return JSON.parse(match[0]);
 }
   const data = await analyzeSlipWithGemini(imgBase64, mimeType);
   // 3. Save to Drive
