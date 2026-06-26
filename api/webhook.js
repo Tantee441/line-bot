@@ -166,7 +166,7 @@ async function handleImage(event) {
   // 3. Save to Drive
   const auth  = getGoogleAuth();
   const drive = google.drive({ version: 'v3', auth });
-  const driveUrl = await saveImageToDrive(drive, imgBuf, mimeType, `slip_${messageId}.jpg`);
+  const driveUrl = await saveImageToDrive(drive, imgBuf, mimeType, `slip_${messageId}.jpg`, data.date);
 
   // 4. Save to Sheets
   const sheets = google.sheets({ version: 'v4', auth });
