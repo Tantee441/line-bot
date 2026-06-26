@@ -106,7 +106,7 @@ async function handleIncome(event, userId, content) {
 
   const data = await parseIncomeWithGemini(content);
   if (!data || !data.amount) {
-    await pushMessage(userId,
+    await pushMessage(event.source.groupId || userId,
       '❌ ไม่เข้าใจข้อมูลครับ กรุณาระบุให้ครบ\n' +
       'เช่น: รายรับ วันนี้ เงินเดือน 15000');
     return;
