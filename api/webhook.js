@@ -171,7 +171,7 @@ async function handleImage(event) {
   // 4. Save to Sheets
   const sheets = google.sheets({ version: 'v4', auth });
   await ensureSheetExists(sheets, 'รายจ่าย',
-    ['วันที่', 'ยอด (บาท)', 'รายการ', 'ผู้รับ/ธนาคาร', 'ลิงก์สลิป', 'LINE UserID', 'บันทึกเมื่อ']);
+    ['วันที่', 'ยอด (บาท)', 'รายการ', 'ผู้รับ/ธนาคาร', 'หมายเหตุ', 'ลิงก์สลิป', 'LINE UserID', 'บันทึกเมื่อ']);
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
@@ -183,6 +183,7 @@ async function handleImage(event) {
         Number(data.amount) || 0,
         data.description || '',
         data.recipient   || '',
+        data.note        || '',
         driveUrl         || '',
         userId,
         todayISO()
@@ -218,7 +219,7 @@ async function analyzeSlipWithGemini(base64, mimeType) {
         contents: [{
           parts: [
             { inline_data: { mime_type: mimeType, data: base64 } },
-            { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.):\n{"date":"","amount":0,"description":"","recipient":""}' }
+            { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.):\n{"date":"","amount":0,"description":"","recipient":"","note":""}' }
           ]
         }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 512 }
