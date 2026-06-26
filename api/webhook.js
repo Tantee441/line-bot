@@ -78,6 +78,10 @@ async function handleText(event) {
   } else if (/^รายรับ\s+/i.test(txt)) {
     await handleIncome(event, userId, txt.replace(/^รายรับ\s+/i, '').trim());
 
+  } else if (lower === 'groupid') {
+    const gid = event.source.groupId || event.source.userId;
+    await replyText(replyToken, `Group ID: ${gid}`);
+
   } else {
     await replyText(replyToken,
       '🤖 สวัสดีครับ! สิ่งที่ทำได้:\n\n' +
