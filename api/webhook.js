@@ -264,27 +264,36 @@ async function analyzeSlipWithGemini(base64, mimeType) {
 
 async function parseIncomeWithGemini(text) {
   const today = todayISO();
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `ข้อความบันทึกรายรับ: "${text}" วันนี้คือ ${today} ตอบ JSON เท่านั้น (date: YYYY-MM-DD ค.ศ. ถ้าบอกว่าวันนี้ใช้ ${today}):\n{"date":"","amount":0,"description":""}`
-          }]
-        }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 256 }
-      })
+  
+  // หายอดเงิน (ตัวเลขสุดท้าย)
+  const amountMatch = text.match(/[\d,]+(?:\.\d+)?(?=\s*$)/);
+  const amount = amountMatch ? parseFloat(amountMatch[0].replace(/,/g, '')) : null;
+  
+  // หาวันที่
+  let date = today;
+  if (/วันนี้|today/i.test(text)) date = today;
+  else if (/เมื่อวาน/i.test(text)) {
+    const d = new Date(); d.setDate(d.getDate() - 1);
+    date = d.toISOString().split('T')[0];
+  } else {
+    const m = text.match(/(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/);
+    if (m) {
+      let [, d, mo, y] = m;
+      y = y ? parseInt(y) : new Date().getFullYear();
+      if (y > 2400) y -= 543;
+      if (y < 100) y += 2000;
+      date = `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     }
-  );
-  const json = await res.json();
-  let txt = json.candidates[0].content.parts[0].text.trim();
-  txt = txt.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
-  const match = txt.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Gemini ตอบไม่ใช่ JSON: ' + txt.slice(0, 100));
-  return JSON.parse(match[0]);
+  }
+  
+  // หา description (ลบวันที่และยอดออก)
+  let description = text
+    .replace(/วันนี้|เมื่อวาน|today/gi, '')
+    .replace(/(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/, '')
+    .replace(/[\d,]+(?:\.\d+)?(?=\s*$)/, '')
+    .trim();
+
+  return { date, amount, description };
 }
 
 
