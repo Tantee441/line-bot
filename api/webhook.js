@@ -69,7 +69,7 @@ async function handleText(event) {
 
   } else if (lower === 'รายรับ') {
     await replyText(replyToken,
-      '💚 บันทึกรายรับ\n─────────────────\n' +
+      '💚 บันทึกรายรับ\n──────────\n' +
       'พิมพ์ในรูปแบบนี้:\n\n' +
       'รายรับ [วันที่] [รายการ] [ยอด]\n\n' +
       'ตัวอย่าง:\nรายรับ วันนี้ เงินเดือน 15000\nรายรับ 25/6 ค่าจ้าง 5000'
@@ -134,11 +134,11 @@ async function handleIncome(event, userId, content) {
   const amtFmt = fmt(data.amount);
   await pushMessage(event.source.groupId || userId,
     '✅ บันทึกรายรับแล้ว!\n' +
-    '─────────────────\n' +
+    '──────────\n' +
     `📅 วันที่   ${fmtDateThai(data.date)}\n` +
     `📝 รายการ  ${data.description || '-'}\n` +
     `💰 ยอด     ฿${amtFmt}\n` +
-    '─────────────────\n' +
+    '──────────\n' +
     '💾 บันทึกใน Google Sheets แล้ว'
   );
 }
@@ -223,12 +223,12 @@ async function handleImage(event) {
   const amtFmt = fmt(data.amount || 0);
   await pushMessage(event.source.groupId || userId,
     '✅ บันทึกรายจ่ายแล้ว!\n' +
-    '─────────────────\n' +
+    '──────────\n' +
     `📅 วันที่    ${fmtDateThai(data.date)}\n` +
     `💰 ยอด      ฿${amtFmt}\n` +
     `📝 รายการ   ${data.description || 'ไม่พบ'}\n` +
     `🏦 ผู้รับ    ${data.recipient   || 'ไม่พบ'}\n` +
-    '─────────────────\n' +
+    '──────────\n' +
     '💾 บันทึกใน Google Sheets + Drive แล้ว\n' +
     (driveUrl ? `🖼 ดูสลิป: ${driveUrl}` : '')
   );
@@ -389,7 +389,7 @@ async function replySummaryExpense(replyToken) {
     .map(r => `• ${r[0]}  ฿${fmt(r[1])}  ${String(r[2]||'').slice(0,15)}`).join('\n');
 
   await replyText(replyToken,
-    `📊 สรุปรายจ่าย\n─────────────────\n` +
+    `📊 สรุปรายจ่าย\n──────────\n` +
     `รายการทั้งหมด: ${rows.length} รายการ\nยอดรวม: ฿${fmt(total)}\n\n` +
     `5 รายการล่าสุด:\n${recent}`
   );
@@ -406,7 +406,7 @@ async function replySummaryIncome(replyToken) {
     .map(r => `• ${r[0]}  ฿${fmt(r[1])}  ${String(r[2]||'').slice(0,15)}`).join('\n');
 
   await replyText(replyToken,
-    `📈 สรุปรายรับ\n─────────────────\n` +
+    `📈 สรุปรายรับ\n──────────\n` +
     `รายการทั้งหมด: ${rows.length} รายการ\nยอดรวม: ฿${fmt(total)}\n\n` +
     `5 รายการล่าสุด:\n${recent}`
   );
@@ -430,8 +430,8 @@ async function replySummaryNet(replyToken) {
   const todayLabel = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
 
   await replyText(replyToken,
-    `📆 สรุปประจำเดือน${monthLabel}\n(1 – ${todayLabel})\n─────────────────\n` +
-    `💚 รายรับ    ฿${fmt(totalInc)}\n❤️ รายจ่าย   ฿${fmt(totalExp)}\n─────────────────\n` +
+    `📆 สรุปประจำเดือน${monthLabel}\n(1 – ${todayLabel})\n──────────\n` +
+    `💚 รายรับ    ฿${fmt(totalInc)}\n❤️ รายจ่าย   ฿${fmt(totalExp)}\n──────────\n` +
     `${net >= 0 ? '✅' : '⚠️'} คงเหลือ   ฿${fmt(net)}`
   );
 }
@@ -454,8 +454,8 @@ async function replyDailySummary(replyToken, targetDate) {
     { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   await replyText(replyToken,
-    `📅 สรุปรายวัน\n${dateLabel}\n─────────────────\n` +
-    `💚 รายรับ    ฿${fmt(totalInc)}\n❤️ รายจ่าย   ฿${fmt(totalExp)}\n─────────────────\n` +
+    `📅 สรุปรายวัน\n${dateLabel}\n──────────\n` +
+    `💚 รายรับ    ฿${fmt(totalInc)}\n❤️ รายจ่าย   ฿${fmt(totalExp)}\n──────────\n` +
     `${net >= 0 ? '✅' : '⚠️'} คงเหลือ   ฿${fmt(net)}`
   );
 }
