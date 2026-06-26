@@ -175,8 +175,7 @@ async function handleImage(event) {
             { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.):\n{"date":"","amount":0,"description":"","recipient":"","note":""}' }
           ]
         }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 1024 },
-        thinkingConfig: { thinkingBudget: 0 }
+        generationConfig: { temperature: 0.1, maxOutputTokens: 4096 }
       })
     }
   );
