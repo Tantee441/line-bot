@@ -161,7 +161,34 @@ async function handleImage(event) {
   const mimeType  = imgRes.headers.get('content-type') || 'image/jpeg';
 
   // 2. Analyze with Gemini
-  const data = await analyzeSlipWithGemini(imgBase64, mimeType);
+  async function analyzeSlipWithGemini(base64, mimeType) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: mimeType, data: base64 } },
+            { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.):\n{"date":"","amount":0,"description":"","recipient":"","note":""}' }
+          ]
+        }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 512 }
+      })
+    }
+  );
+  const json = await res.json();
+  console.log('Gemini raw response:', JSON.stringify(json));
+  
+  if (!json.candidates || !json.candidates[0]) {
+    throw new Error('Gemini ไม่ตอบกลับ: ' + JSON.stringify(json));
+  }
+  
+  let text = json.candidates[0].content.parts[0].text.trim();
+  text = text.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
+  return JSON.parse(text);
+}
 
   // 3. Save to Drive
   const auth  = getGoogleAuth();
