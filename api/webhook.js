@@ -294,6 +294,7 @@ async function saveImageToDrive(drive, imgBuf, mimeType, filename, slipDate) {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey    = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const crypto    = require('crypto');
 
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const publicId  = `${folder}/${filename.replace('.jpg', '')}`;
