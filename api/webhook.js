@@ -189,7 +189,7 @@ async function handleImage(event) {
   text = text.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
   return JSON.parse(text);
 }
-
+  const data = await analyzeSlipWithGemini(imgBase64, mimeType);
   // 3. Save to Drive
   const auth  = getGoogleAuth();
   const drive = google.drive({ version: 'v3', auth });
