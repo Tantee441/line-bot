@@ -1,4 +1,5 @@
 const { google } = require('googleapis');
+const crypto = require('crypto');
 
 const LINE_TOKEN     = process.env.LINE_TOKEN;
 const GEMINI_KEY     = process.env.GEMINI_KEY;
@@ -287,37 +288,33 @@ async function parseIncomeWithGemini(text) {
 //  GOOGLE DRIVE
 // ══════════════════════════════════════════════════════════════
 async function saveImageToDrive(drive, imgBuf, mimeType, filename, slipDate) {
-  const ROOT_FOLDER_ID = '1dIRgs4tzNfl4G9fueD5PAAm5kLyMuy3i';
-  const monthName = slipDate ? slipDate.slice(0, 7) : new Date().toISOString().slice(0, 7);
+  const monthFolder = slipDate ? slipDate.slice(0, 7) : new Date().toISOString().slice(0, 7);
+  const folder = `สลิปรายจ่าย/${monthFolder}`;
 
-  async function findOrCreate(name, parentId) {
-    const res = await drive.files.list({
-      q: `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-      fields: 'files(id)'
-    });
-    if (res.data.files.length > 0) return res.data.files[0].id;
-    const f = await drive.files.create({
-      requestBody: { name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] },
-      fields: 'id'
-    });
-    return f.data.id;
-  }
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey    = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-  const monthId = await findOrCreate(monthName, ROOT_FOLDER_ID);
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const publicId  = `${folder}/${filename.replace('.jpg', '')}`;
+  const toSign    = `folder=${folder}&public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
+  const signature = crypto.createHash('sha256').update(toSign).digest('hex');
 
-  const { Readable } = require('stream');
-  const file = await drive.files.create({
-    requestBody: { name: filename, parents: [monthId] },
-    media: { mimeType, body: Readable.from(Buffer.from(imgBuf)) },
-    fields: 'id, webViewLink'
+  const formData = new FormData();
+  formData.append('file', new Blob([imgBuf], { type: mimeType }), filename);
+  formData.append('api_key', apiKey);
+  formData.append('timestamp', timestamp);
+  formData.append('public_id', publicId);
+  formData.append('folder', folder);
+  formData.append('signature', signature);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData
   });
 
-  await drive.permissions.create({
-    fileId: file.data.id,
-    requestBody: { role: 'reader', type: 'anyone' }
-  });
-
-  return file.data.webViewLink;
+  const json = await res.json();
+  return json.secure_url || '';
 }
 
 
