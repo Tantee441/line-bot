@@ -282,7 +282,9 @@ async function parseIncomeWithGemini(text) {
   const json = await res.json();
   let txt = json.candidates[0].content.parts[0].text.trim();
   txt = txt.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
-  return JSON.parse(txt);
+  const match = txt.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('Gemini ตอบไม่ใช่ JSON: ' + txt.slice(0, 100));
+  return JSON.parse(match[0]);
 }
 
 
