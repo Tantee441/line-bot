@@ -57,8 +57,8 @@ async function handleText(event) {
     const datePart = txt.replace(/^สรุปรายวัน\s*/i, '').trim();
     let target;
     if (!datePart) {
-      const d = new Date(); d.setDate(d.getDate() - 1);
-      target = d.toISOString().split('T')[0];
+      target = todayISO();
+    }
     } else {
       target = parseDate(datePart);
     }
@@ -509,7 +509,9 @@ function inRange(dateStr, from, to) {
 }
 
 function todayISO() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  d.setHours(d.getHours() + 7);
+  return d.toISOString().split('T')[0];
 }
 
 function fmtDateThai(dateStr) {
