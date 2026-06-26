@@ -416,7 +416,7 @@ async function replySummaryNet(replyToken) {
   const auth   = getGoogleAuth();
   const sheets = google.sheets({ version: 'v4', auth });
 
-  const now        = new Date();
+  const now        = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const expRows = (await getSheetRows(sheets, 'รายจ่าย')).filter(r => inRange(r[0], monthStart, now));
