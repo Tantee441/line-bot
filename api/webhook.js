@@ -133,7 +133,7 @@ async function handleIncome(event, userId, content) {
   });
 
   const amtFmt = fmt(data.amount);
-  await pushMessage(userId,
+  await pushMessage(event.source.groupId || userId,
     '✅ บันทึกรายรับแล้ว!\n' +
     '─────────────────\n' +
     `📅 วันที่   ${fmtDateThai(data.date)}\n` +
@@ -222,7 +222,7 @@ async function handleImage(event) {
   });
 
   const amtFmt = fmt(data.amount || 0);
-  await pushMessage(userId,
+  await pushMessage(event.source.groupId || userId,
     '✅ บันทึกรายจ่ายแล้ว!\n' +
     '─────────────────\n' +
     `📅 วันที่    ${fmtDateThai(data.date)}\n` +
@@ -462,7 +462,7 @@ async function replyText(replyToken, text) {
   });
 }
 
-async function pushMessage(userId, text) {
+async function pushMessage(event.source.groupId || userId, text) {
   await fetch('https://api.line.me/v2/bot/message/push', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LINE_TOKEN}` },
