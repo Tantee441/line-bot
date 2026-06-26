@@ -462,11 +462,11 @@ async function replyText(replyToken, text) {
   });
 }
 
-async function pushMessage(event.source.groupId || userId, text) {
+async function pushMessage(to, text) {
   await fetch('https://api.line.me/v2/bot/message/push', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LINE_TOKEN}` },
-    body: JSON.stringify({ to: userId, messages: [{ type: 'text', text }] })
+    body: JSON.stringify({ to: to, messages: [{ type: 'text', text }] })
   });
 }
 
