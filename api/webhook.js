@@ -171,7 +171,7 @@ async function handleImage(event) {
         contents: [{
           parts: [
             { inline_data: { mime_type: mimeType, data: base64 } },
-            { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.):\n{"date":"","amount":0,"description":"","recipient":"","note":""}' }
+            { text: 'นี่คือสลิปโอนเงิน ตอบ JSON เท่านั้น ห้ามมีข้อความอื่น (date: YYYY-MM-DD ค.ศ.) description ให้ใช้ข้อความจากช่อง "บันทึกช่วยจำ" หรือ "หมายเหตุ" หรือ "memo" ถ้าไม่มีให้ใช้ชื่อผู้รับแทน:\n{"date":"","amount":0,"description":"","recipient":"","note":""}' }
           ]
         }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 4096 }
