@@ -230,7 +230,7 @@ async function handleImage(event) {
     `🏦 ผู้รับ    ${data.recipient   || 'ไม่พบ'}\n` +
     '──────────\n' +
     '💾 บันทึกใน Google Sheets + Drive แล้ว\n' +
-    (driveUrl ? `🖼 ดูสลิป: ${driveUrl}` : '')
+    ''
   );
 }
 
