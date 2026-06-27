@@ -321,6 +321,7 @@ async function saveImageToDrive(drive, imgBuf, mimeType, filename, slipDate) {
   formData.append('folder', folder);
   formData.append('signature', signature);
 
+  console.log('Uploading to Cloudinary, cloud:', cloudName, 'folder:', folder);
   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
     method: 'POST',
     body: formData
